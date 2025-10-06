@@ -18,11 +18,8 @@ namespace Editor
             WorldPoints.Add(worldPoint);
         }
 
-        // Для обратной совместимости со старым кодом
         public void AddPoint(Point screenPoint)
         {
-            // Этот метод теперь не используется в новой системе координат
-            // Но оставляем для совместимости
             WorldPoints.Add(new PointF(screenPoint.X, screenPoint.Y));
         }
 
@@ -111,7 +108,6 @@ namespace Editor
     }
 
     
-
     public static class GeometryHelper
     {
         public static bool IsPointOnEdge(Point screenPoint, Edge edge, float tolerance, PointF centerPoint, int gridSize)
@@ -129,7 +125,6 @@ namespace Editor
             return distance <= worldTolerance;
         }
 
-        // Старый метод для обратной совместимости
         public static bool IsPointOnEdge(Point point, Edge edge, float tolerance)
         {
             // Используем центр (0,0) и gridSize=1 для совместимости со старым кодом
@@ -202,11 +197,9 @@ public class Edge
         graphics.FillEllipse(pen.Brush, screenEnd.X - 2, screenEnd.Y - 2, 4, 4);
     }
 
-    // Для обратной совместимости со старым кодом
     public void Draw(Graphics graphics, Pen pen)
     {
-        // Этот метод используется в старом коде - преобразуем мировые координаты в экранные
-        // с использованием центра (0,0) и gridSize=1 для совместимости
+        // преобразуем мировые координаты в экранные с использованием центра (0,0) и gridSize=1 для совместимости
         var center = new PointF(0, 0);
         int grid = 1;
         Draw(graphics, pen, center, grid);

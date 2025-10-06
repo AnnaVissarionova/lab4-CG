@@ -25,11 +25,20 @@ namespace Editor
         private Point testPoint;
         private Edge selectedEdge1, selectedEdge2;
 
+        // переменные для определния положения точки относительно ребра
+        private Edge selectedEdgeForClassification = null;
+        private bool isSelectingEdge = true;
+
         // Панели для разных режимов
         private Panel affinePanel;
         private ComboBox transformComboBox;
         private TextBox dxTextBox, dyTextBox, angleTextBox, scaleTextBox, centerXTextBox, centerYTextBox;
         private Button applyTransformButton;
+        private Panel classificationPanel;
+        private Button selectEdgeButton, selectPointButton, finishButton;
+        private Label statusLabel;
+
+        private Label dxLabel, dyLabel, angleLabel, scaleLabel, centerXLabel, centerYLabel;
 
         // Цветовая схема
         private Color backgroundColor = Color.FromArgb(240, 240, 240);
@@ -41,6 +50,7 @@ namespace Editor
         {
             InitializeComponent();
             InitializeAffinePanel();
+            InitializeClassificationPanel();
             this.DoubleBuffered = true;
             this.Paint += MainForm_Paint;
             this.MouseClick += MainForm_MouseClick;
@@ -281,12 +291,12 @@ namespace Editor
                 Font = new Font("Segoe UI", 9)
             };
             transformComboBox.Items.AddRange(new string[] {
-        "Смещение",
-        "Поворот вокруг точки",
-        "Поворот вокруг центра",
-        "Масштабирование от точки",
-        "Масштабирование от центра"
-    });
+                "Смещение",
+                "Поворот вокруг точки",
+                "Поворот вокруг центра",
+                "Масштабирование от точки",
+                "Масштабирование от центра"
+            });
             transformComboBox.SelectedIndex = 0;
             transformComboBox.SelectedIndexChanged += TransformComboBox_SelectedIndexChanged;
 
@@ -298,26 +308,26 @@ namespace Editor
             int secondColumnX = 170;
 
             // Первая строка - dx, dy
-            var dxLabel = CreateInputLabel("dx:", firstColumnX, inputY, labelWidth);
+            dxLabel = CreateInputLabel("dx:", firstColumnX, inputY, labelWidth);
             dxTextBox = CreateInputTextBox(firstColumnX + 65, inputY, textBoxWidth, "0");
 
-            var dyLabel = CreateInputLabel("dy:", secondColumnX, inputY, labelWidth);
+            dyLabel = CreateInputLabel("dy:", secondColumnX, inputY, labelWidth);
             dyTextBox = CreateInputTextBox(secondColumnX + 65, inputY, textBoxWidth, "0");
 
             // Вторая строка - угол, масштаб
             inputY += 30;
-            var angleLabel = CreateInputLabel("Угол:", firstColumnX, inputY, labelWidth);
+            angleLabel = CreateInputLabel("Угол:", firstColumnX, inputY, labelWidth);
             angleTextBox = CreateInputTextBox(firstColumnX + 65, inputY, textBoxWidth, "0");
 
-            var scaleLabel = CreateInputLabel("Масштаб:", secondColumnX, inputY, labelWidth);
+            scaleLabel = CreateInputLabel("Масштаб:", secondColumnX, inputY, labelWidth);
             scaleTextBox = CreateInputTextBox(secondColumnX + 65, inputY, textBoxWidth, "1");
 
             // Третья строка - центр
             inputY += 30;
-            var centerXLabel = CreateInputLabel("Центр X:", firstColumnX, inputY, labelWidth);
+            centerXLabel = CreateInputLabel("Центр X:", firstColumnX, inputY, labelWidth);
             centerXTextBox = CreateInputTextBox(firstColumnX + 65, inputY, textBoxWidth, "0");
 
-            var centerYLabel = CreateInputLabel("Центр Y:", secondColumnX, inputY, labelWidth);
+            centerYLabel = CreateInputLabel("Центр Y:", secondColumnX, inputY, labelWidth);
             centerYTextBox = CreateInputTextBox(secondColumnX + 65, inputY, textBoxWidth, "0");
 
             // Разделитель
@@ -353,29 +363,146 @@ namespace Editor
             };
 
             // Добавляем все контролы в панель
-            affinePanel.Controls.Add(affineTitle);
-            affinePanel.Controls.Add(transformComboBox);
-            affinePanel.Controls.Add(dxLabel);
-            affinePanel.Controls.Add(dxTextBox);
-            affinePanel.Controls.Add(dyLabel);
-            affinePanel.Controls.Add(dyTextBox);
-            affinePanel.Controls.Add(angleLabel);
-            affinePanel.Controls.Add(angleTextBox);
-            affinePanel.Controls.Add(scaleLabel);
-            affinePanel.Controls.Add(scaleTextBox);
-            affinePanel.Controls.Add(centerXLabel);
-            affinePanel.Controls.Add(centerXTextBox);
-            affinePanel.Controls.Add(centerYLabel);
-            affinePanel.Controls.Add(centerYTextBox);
-            affinePanel.Controls.Add(separator2);
-            affinePanel.Controls.Add(applyTransformButton);
-            affinePanel.Controls.Add(statusLabel);
+            affinePanel.Controls.Add(affineTitle);       
+            affinePanel.Controls.Add(transformComboBox); 
+            affinePanel.Controls.Add(dxLabel);           
+            affinePanel.Controls.Add(dxTextBox);         
+            affinePanel.Controls.Add(dyLabel);           
+            affinePanel.Controls.Add(dyTextBox);         
+            affinePanel.Controls.Add(angleLabel);        
+            affinePanel.Controls.Add(angleTextBox);     
+            affinePanel.Controls.Add(scaleLabel);        
+            affinePanel.Controls.Add(scaleTextBox);     
+            affinePanel.Controls.Add(centerXLabel);     
+            affinePanel.Controls.Add(centerXTextBox);    
+            affinePanel.Controls.Add(centerYLabel);      
+            affinePanel.Controls.Add(centerYTextBox);  
+            affinePanel.Controls.Add(separator2);        
+            affinePanel.Controls.Add(applyTransformButton); 
+            affinePanel.Controls.Add(statusLabel);         
 
             this.Controls.Add(affinePanel);
 
             // Инициализируем видимость полей
             UpdateInputVisibility();
         }
+
+        private void InitializeClassificationPanel()
+        {
+            classificationPanel = new Panel
+            {
+                Location = new Point(190, 10),
+                Size = new Size(200, 150),
+                BackColor = panelColor,
+                BorderStyle = BorderStyle.FixedSingle,
+                Visible = false
+            };
+
+            // Заголовок
+            var title = new Label
+            {
+                Text = "Классификация точки",
+                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                ForeColor = Color.FromArgb(60, 60, 60),
+                Location = new Point(10, 10),
+                Size = new Size(180, 20),
+                TextAlign = ContentAlignment.MiddleCenter
+            };
+
+            // создаем кнопки
+            selectEdgeButton = new Button
+            {
+                Text = "Выбрать ребро",
+                Location = new Point(10, 40),
+                Size = new Size(180, 30),
+                BackColor = accentColor,
+                ForeColor = Color.White,
+                FlatStyle = FlatStyle.Flat
+            };
+
+            selectPointButton = new Button
+            {
+                Text = "Выбрать точку",
+                Location = new Point(10, 75),
+                Size = new Size(180, 30),
+                BackColor = Color.LightGray,
+                ForeColor = Color.Black,
+                FlatStyle = FlatStyle.Flat,
+                Enabled = false
+            };
+
+            finishButton = new Button
+            {
+                Text = "Завершить",
+                Location = new Point(10, 110),
+                Size = new Size(180, 30),
+                BackColor = Color.White,
+                ForeColor = Color.Black,
+                FlatStyle = FlatStyle.Flat
+            };
+
+            statusLabel = new Label
+            {
+                Text = "Выберите ребро на сцене",
+                ForeColor = Color.FromArgb(100, 100, 100),
+                Font = new Font("Segoe UI", 8),
+                Location = new Point(10, 145),
+                Size = new Size(180, 30)
+            };
+
+            // добавляем обработчики
+            selectEdgeButton.Click += (s, e) => {
+                isSelectingEdge = true;
+                selectEdgeButton.BackColor = accentColor;
+                selectPointButton.BackColor = Color.LightGray;
+                statusLabel.Text = "Выберите ребро на сцене";
+                testPoint = Point.Empty;
+                this.Invalidate();
+            };
+
+            selectPointButton.Click += (s, e) => {
+                if (selectedEdge1 != null)
+                {
+                    isSelectingEdge = false;
+                    selectPointButton.BackColor = accentColor;
+                    selectEdgeButton.BackColor = Color.LightGray;
+                    statusLabel.Text = "Выберите точку на сцене";
+                }
+                else
+                {
+                    MessageBox.Show("Сначала выберите ребро", "Внимание");
+                }
+            };
+
+            finishButton.Click += (s, e) => {
+                SetMode(Mode.Drawing);
+                // Находим и включаем переключатель рисования
+                foreach (Control control in this.Controls)
+                {
+                    if (control is Panel panel)
+                    {
+                        foreach (Control ctrl in panel.Controls)
+                        {
+                            if (ctrl is RadioButton radio && radio.Text == "Рисование")
+                            {
+                                radio.Checked = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            };
+
+            // добавляем контролы в панель
+            classificationPanel.Controls.Add(title);
+            classificationPanel.Controls.Add(selectEdgeButton);
+            classificationPanel.Controls.Add(selectPointButton);
+            classificationPanel.Controls.Add(finishButton);
+            classificationPanel.Controls.Add(statusLabel);
+
+            this.Controls.Add(classificationPanel);
+        }
+
         private void ApplyTransformButton_Click(object sender, EventArgs e)
         {
             var selectedPolygon = polygons.Find(p => p.IsSelected);
@@ -428,73 +555,54 @@ namespace Editor
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void UpdateInputVisibility()
         {
             int selectedIndex = transformComboBox.SelectedIndex;
 
-            // Всегда скрываем все поля сначала
-            foreach (Control control in affinePanel.Controls)
-            {
-                if (control is TextBox || (control is Label && control != affinePanel.Controls[0])) // кроме заголовка
-                {
-                    control.Visible = false;
-                }
-            }
+            // Скрываем поля ввода 
+            dxLabel.Visible = dxTextBox.Visible = false;
+            dyLabel.Visible = dyTextBox.Visible = false;
+            angleLabel.Visible = angleTextBox.Visible = false;
+            scaleLabel.Visible = scaleTextBox.Visible = false;
+            centerXLabel.Visible = centerXTextBox.Visible = false;
+            centerYLabel.Visible = centerYTextBox.Visible = false;
 
-            // Показываем только нужные поля в зависимости от выбранного преобразования
+            // Показываем только нужные поля
             switch (selectedIndex)
             {
-                case 0: // Смещение
-                        // dx, dy
-                    affinePanel.Controls[2].Visible = true; // dxLabel
-                    affinePanel.Controls[3].Visible = true; // dxTextBox
-                    affinePanel.Controls[4].Visible = true; // dyLabel
-                    affinePanel.Controls[5].Visible = true; // dyTextBox
+                case 0: // Смещение - dx, dy
+                    dxLabel.Visible = dxTextBox.Visible = true;
+                    dyLabel.Visible = dyTextBox.Visible = true;
                     applyTransformButton.Text = "Применить смещение";
                     break;
 
-                case 1: // Поворот вокруг точки
-                        // угол, центр X, центр Y
-                    affinePanel.Controls[6].Visible = true; // angleLabel
-                    affinePanel.Controls[7].Visible = true; // angleTextBox
-                    affinePanel.Controls[12].Visible = true; // centerXLabel
-                    affinePanel.Controls[13].Visible = true; // centerXTextBox
-                    affinePanel.Controls[8].Visible = true; // centerYLabel
-                    affinePanel.Controls[9].Visible = true; // centerYTextBox
+                case 1: // Поворот вокруг точки - угол, центр X, центр Y
+                    angleLabel.Visible = angleTextBox.Visible = true;
+                    centerXLabel.Visible = centerXTextBox.Visible = true;
+                    centerYLabel.Visible = centerYTextBox.Visible = true;
                     applyTransformButton.Text = "Повернуть вокруг точки";
                     break;
 
-                case 2: // Поворот вокруг центра
-                        // только угол
-                    affinePanel.Controls[6].Visible = true; // angleLabel
-                    affinePanel.Controls[7].Visible = true; // angleTextBox
+                case 2: // Поворот вокруг центра - только угол
+                    angleLabel.Visible = angleTextBox.Visible = true;
                     applyTransformButton.Text = "Повернуть вокруг центра";
                     break;
 
-                case 3: // Масштабирование от точки
-                        // масштаб, центр X, центр Y
-                    affinePanel.Controls[8].Visible = true; // scaleLabel
-                    affinePanel.Controls[9].Visible = true; // scaleTextBox
-                    affinePanel.Controls[10].Visible = true; // centerXLabel
-                    affinePanel.Controls[11].Visible = true; // centerXTextBox
-                    affinePanel.Controls[12].Visible = true; // centerYLabel
-                    affinePanel.Controls[13].Visible = true; // centerYTextBox
+                case 3: // Масштабирование от точки - масштаб, центр X, центр Y
+                    scaleLabel.Visible = scaleTextBox.Visible = true;
+                    centerXLabel.Visible = centerXTextBox.Visible = true;
+                    centerYLabel.Visible = centerYTextBox.Visible = true;
                     applyTransformButton.Text = "Масштабировать от точки";
                     break;
 
-                case 4: // Масштабирование от центра
-                        // только масштаб
-                    affinePanel.Controls[10].Visible = true; // scaleLabel
-                    affinePanel.Controls[11].Visible = true; // scaleTextBox
+                case 4: // Масштабирование от центра - только масштаб
+                    scaleLabel.Visible = scaleTextBox.Visible = true;
                     applyTransformButton.Text = "Масштабировать от центра";
                     break;
             }
-
-            // Всегда показываем разделитель, кнопку и статус
-            affinePanel.Controls[14].Visible = true; // separator2
-            affinePanel.Controls[15].Visible = true; // applyTransformButton
-            affinePanel.Controls[16].Visible = true; // statusLabel
         }
+
         private Label CreateInputLabel(string text, int x, int y, int width)
         {
             return new Label
@@ -543,6 +651,19 @@ namespace Editor
 
             currentMode = mode;
             affinePanel.Visible = (mode == Mode.AffineTransform);
+
+            classificationPanel.Visible = (mode == Mode.PointClassification);
+
+            if (mode == Mode.PointClassification)
+            {
+                selectedEdge1 = null;
+                testPoint = Point.Empty;
+                isSelectingEdge = true; 
+                selectPointButton.Enabled = false;
+                selectEdgeButton.BackColor = accentColor;
+                selectPointButton.BackColor = Color.LightGray;
+                statusLabel.Text = "Выберите ребро на сцене";
+            }
 
             if (mode != Mode.Intersection)
             {
@@ -685,13 +806,20 @@ namespace Editor
                     break;
 
                 case Mode.PointClassification:
+                    // Явно рисуем выбранное ребро красным цветом
+                    if (selectedEdge1 != null)
+                    {
+                        var redPen = new Pen(Color.Red, 3);
+                        selectedEdge1.Draw(e.Graphics, redPen, centerPoint, gridSize);
+                    }
+
+                    // Рисуем точку и подпись
                     if (!testPoint.IsEmpty)
                     {
                         e.Graphics.FillEllipse(Brushes.Purple, testPoint.X - 4, testPoint.Y - 4, 8, 8);
 
                         if (selectedEdge1 != null)
                         {
-                            // Преобразуем экранную точку в мировые координаты для классификации
                             var worldPoint = new PointF(
                                 (testPoint.X - centerPoint.X) / gridSize,
                                 (centerPoint.Y - testPoint.Y) / gridSize
@@ -700,8 +828,7 @@ namespace Editor
                             int classification = PointClassificationHelper.ClassifyPointRelativeToEdge(worldPoint, selectedEdge1);
                             string position = classification > 0 ? "СЛЕВА" :
                                             classification < 0 ? "СПРАВА" : "НА ЛИНИИ";
-                            Color color = classification > 0 ? Color.Green :
-                                        classification < 0 ? Color.Orange : Color.Blue;
+                            Color color = PointClassificationHelper.GetPositionColor(classification);
 
                             e.Graphics.DrawString(position,
                                 new Font("Segoe UI", 9, FontStyle.Bold), new SolidBrush(color),
@@ -809,14 +936,35 @@ namespace Editor
             testPoint = point;
         }
 
-        private void HandlePointClassificationMode(Point point)
+        private void HandlePointClassificationMode(Point screenPoint)
         {
-            testPoint = point;
-
-            var edge = FindEdgeAtPoint(point);
-            if (edge != null)
+            if (isSelectingEdge)
             {
-                selectedEdge1 = edge;
+                // Выбор ребра
+                var edge = FindEdgeAtPoint(screenPoint);
+                if (edge != null)
+                {
+                    selectedEdge1 = edge;
+                    selectPointButton.Enabled = true;
+                    statusLabel.Text = "Ребро выбрано! Нажмите 'Выбрать точку'";
+                    this.Invalidate();
+                }
+            }
+            else
+            {
+                // Выбор точки
+                var worldPoint = new PointF(
+                    (screenPoint.X - centerPoint.X) / gridSize,
+                    (centerPoint.Y - screenPoint.Y) / gridSize
+                );
+
+                int classification = PointClassificationHelper.ClassifyPointRelativeToEdge(worldPoint, selectedEdge1);
+                string position = classification > 0 ? "СЛЕВА" :
+                                classification < 0 ? "СПРАВА" : "НА ЛИНИИ";
+
+                testPoint = screenPoint;
+                statusLabel.Text = $"Точка находится: {position}";
+                this.Invalidate();
             }
         }
 
@@ -849,8 +997,5 @@ namespace Editor
                 }
             }
         }
-
-
-
     }
 }
