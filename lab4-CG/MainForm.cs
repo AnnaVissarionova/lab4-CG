@@ -210,8 +210,8 @@ namespace Editor
             }
 
             // Подписи осей в углах
-            g.DrawString("X", new Font("Arial", 9, FontStyle.Bold), Brushes.Black, this.Width - 40, centerPoint.Y - 15);
-            g.DrawString("Y", new Font("Arial", 9, FontStyle.Bold), Brushes.Black, centerPoint.X - 25, 5);
+            g.DrawString("X", new Font("Arial", 9, FontStyle.Bold), Brushes.Black, this.Width - 20, centerPoint.Y - 15);
+            g.DrawString("Y", new Font("Arial", 9, FontStyle.Bold), Brushes.Black, centerPoint.X + 5, 5);
 
             // Отметка центра
             g.FillEllipse(Brushes.Red, centerPoint.X - 2, centerPoint.Y - 2, 4, 4);
@@ -641,15 +641,73 @@ namespace Editor
             switch (currentMode)
             {
                 case Mode.Intersection:
-                    
+                    if (selectedEdge1 != null) selectedEdge1.Draw(e.Graphics, new Pen(Color.Red, 2), centerPoint, gridSize);
+                    if (selectedEdge2 != null) selectedEdge2.Draw(e.Graphics, new Pen(Color.Blue, 2), centerPoint, gridSize);
+
+                    if (selectedEdge1 != null && selectedEdge2 != null)
+                    {
+                        var intersection = IntersectionHelper.FindIntersection(selectedEdge1, selectedEdge2);
+                        if (intersection.HasValue)
+                        {
+                            // Преобразуем мировые координаты пересечения в экранные
+                            var screenIntersection = new PointF(
+                                centerPoint.X + intersection.Value.X * gridSize,
+                                centerPoint.Y - intersection.Value.Y * gridSize
+                            );
+                            e.Graphics.FillEllipse(Brushes.Green,
+                                screenIntersection.X - 4, screenIntersection.Y - 4, 8, 8);
+                        }
+                    }
                     break;
 
                 case Mode.PointInPolygon:
-                  
+                    if (!testPoint.IsEmpty)
+                    {
+                        e.Graphics.FillEllipse(Brushes.Red, testPoint.X - 4, testPoint.Y - 4, 8, 8);
+
+                        bool insideAny = false;
+                        foreach (var polygon in polygons)
+                        {
+                            if (polygon.Contains(testPoint, centerPoint, gridSize))
+                            {
+                                insideAny = true;
+                                var worldCenter = polygon.GetCenter();
+                                var screenCenter = new PointF(
+                                    centerPoint.X + worldCenter.X * gridSize,
+                                    centerPoint.Y - worldCenter.Y * gridSize
+                                );
+                                e.Graphics.DrawString("ВНУТРИ",
+                                    new Font("Segoe UI", 9, FontStyle.Bold), Brushes.Green,
+                                    screenCenter.X, screenCenter.Y - 20);
+                            }
+                        }
+                    }
                     break;
 
                 case Mode.PointClassification:
-                   
+                    if (!testPoint.IsEmpty)
+                    {
+                        e.Graphics.FillEllipse(Brushes.Purple, testPoint.X - 4, testPoint.Y - 4, 8, 8);
+
+                        if (selectedEdge1 != null)
+                        {
+                            // Преобразуем экранную точку в мировые координаты для классификации
+                            var worldPoint = new PointF(
+                                (testPoint.X - centerPoint.X) / gridSize,
+                                (centerPoint.Y - testPoint.Y) / gridSize
+                            );
+
+                            int classification = PointClassificationHelper.ClassifyPointRelativeToEdge(worldPoint, selectedEdge1);
+                            string position = classification > 0 ? "СЛЕВА" :
+                                            classification < 0 ? "СПРАВА" : "НА ЛИНИИ";
+                            Color color = classification > 0 ? Color.Green :
+                                        classification < 0 ? Color.Orange : Color.Blue;
+
+                            e.Graphics.DrawString(position,
+                                new Font("Segoe UI", 9, FontStyle.Bold), new SolidBrush(color),
+                                testPoint.X + 10, testPoint.Y - 15);
+                        }
+                    }
                     break;
             }
 
@@ -727,20 +785,51 @@ namespace Editor
 
         private void HandleIntersectionMode(Point point)
         {
-           
+            var edge = FindEdgeAtPoint(point);
+            if (edge != null)
+            {
+                if (selectedEdge1 == null)
+                {
+                    selectedEdge1 = edge;
+                }
+                else if (selectedEdge2 == null && edge != selectedEdge1)
+                {
+                    selectedEdge2 = edge;
+                }
+                else
+                {
+                    selectedEdge1 = edge;
+                    selectedEdge2 = null;
+                }
+            }
         }
 
         private void HandlePointInPolygonMode(Point point)
         {
+            testPoint = point;
         }
 
         private void HandlePointClassificationMode(Point point)
         {
-           
+            testPoint = point;
+
+            var edge = FindEdgeAtPoint(point);
+            if (edge != null)
+            {
+                selectedEdge1 = edge;
+            }
         }
 
         private Edge FindEdgeAtPoint(Point point)
         {
+            foreach (var polygon in polygons)
+            {
+                foreach (var edge in polygon.GetEdges())
+                {
+                    if (GeometryHelper.IsPointOnEdge(point, edge, 5, centerPoint, gridSize))
+                        return edge;
+                }
+            }
             return null;
         }
 
