@@ -19,6 +19,7 @@ namespace Editor
         }
 
         private Mode currentMode = Mode.Drawing;
+        private String commonFont = "Comic Sans MS, Verdana";
         private List<Polygon> polygons = new List<Polygon>();
         private Polygon currentPolygon = null;
         private Point lastMousePosition;
@@ -76,7 +77,7 @@ namespace Editor
             var titleLabel = new Label
             {
                 Text = "Polygon Editor",
-                Font = new Font("Segoe UI", 11, FontStyle.Bold),
+                Font = new Font(commonFont, 11, FontStyle.Bold),
                 ForeColor = Color.FromArgb(60, 60, 60),
                 Location = new Point(10, 10),
                 Size = new Size(150, 25),
@@ -113,7 +114,7 @@ namespace Editor
                 BackColor = Color.White,
                 ForeColor = Color.FromArgb(60, 60, 60),
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font(commonFont, 9)
             };
             clearButton.FlatAppearance.BorderColor = borderColor;
             clearButton.Click += (s, e) => ClearScene();
@@ -121,9 +122,9 @@ namespace Editor
             // Информация
             var infoLabel = new Label
             {
-                Text = "ЛКМ - добавить точку\nESC - завершить фигуру\nEnter - замкнуть полигон",
+                Text = "ЛКМ - добавить точку\nПробел - замкнуть полигон",
                 ForeColor = Color.FromArgb(100, 100, 100),
-                Font = new Font("Segoe UI", 8),
+                Font = new Font(commonFont, 8),
                 Location = new Point(10, 220),
                 Size = new Size(150, 60)
             };
@@ -256,7 +257,7 @@ namespace Editor
                 Size = new Size(160, 20),
                 ForeColor = Color.FromArgb(60, 60, 60),
                 BackColor = panelColor,
-                Font = new Font("Segoe UI", 9),
+                Font = new Font(commonFont, 9),
                 Checked = isChecked
             };
         }
@@ -276,7 +277,7 @@ namespace Editor
             var affineTitle = new Label
             {
                 Text = "Аффинные преобразования",
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new Font(commonFont, 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(60, 60, 60),
                 Location = new Point(10, 10),
                 Size = new Size(360, 20),
@@ -288,7 +289,7 @@ namespace Editor
                 Location = new Point(10, 35),
                 Size = new Size(300, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font(commonFont, 9)
             };
             transformComboBox.Items.AddRange(new string[] {
                 "Смещение",
@@ -347,7 +348,7 @@ namespace Editor
                 BackColor = accentColor,
                 ForeColor = Color.White,
                 FlatStyle = FlatStyle.Flat,
-                Font = new Font("Segoe UI", 9)
+                Font = new Font(commonFont, 9)
             };
             applyTransformButton.FlatAppearance.BorderColor = accentColor;
             applyTransformButton.Click += ApplyTransformButton_Click;
@@ -357,7 +358,7 @@ namespace Editor
             {
                 Text = "Выберите полигон на сцене и настройте параметры",
                 ForeColor = Color.FromArgb(100, 100, 100),
-                Font = new Font("Segoe UI", 8),
+                Font = new Font(commonFont, 8),
                 Location = new Point(10, inputY + 85),
                 Size = new Size(260, 35)
             };
@@ -402,7 +403,7 @@ namespace Editor
             var title = new Label
             {
                 Text = "Классификация точки",
-                Font = new Font("Segoe UI", 10, FontStyle.Bold),
+                Font = new Font(commonFont, 10, FontStyle.Bold),
                 ForeColor = Color.FromArgb(60, 60, 60),
                 Location = new Point(10, 10),
                 Size = new Size(180, 20),
@@ -445,7 +446,7 @@ namespace Editor
             {
                 Text = "Выберите ребро на сцене",
                 ForeColor = Color.FromArgb(100, 100, 100),
-                Font = new Font("Segoe UI", 8),
+                Font = new Font(commonFont, 8),
                 Location = new Point(10, 145),
                 Size = new Size(180, 30)
             };
@@ -594,7 +595,7 @@ namespace Editor
                 Location = new Point(x, y),
                 Size = new Size(width, 20),
                 ForeColor = Color.FromArgb(60, 60, 60),
-                Font = new Font("Segoe UI", 9),
+                Font = new Font(commonFont, 9),
                 TextAlign = ContentAlignment.MiddleLeft
             };
         }
@@ -606,7 +607,7 @@ namespace Editor
                 Location = new Point(x, y),
                 Size = new Size(width, 23),
                 Text = defaultValue,
-                Font = new Font("Segoe UI", 9),
+                Font = new Font(commonFont, 9),
                 BorderStyle = BorderStyle.FixedSingle
             };
         }
@@ -781,7 +782,7 @@ namespace Editor
                                     centerPoint.Y - worldCenter.Y * gridSize
                                 );
                                 e.Graphics.DrawString("ВНУТРИ",
-                                    new Font("Segoe UI", 9, FontStyle.Bold), Brushes.Green,
+                                    new Font(commonFont, 9, FontStyle.Bold), Brushes.Green,
                                     screenCenter.X, screenCenter.Y - 20);
                             }
                         }
@@ -814,7 +815,7 @@ namespace Editor
                             Color color = PointClassificationHelper.GetPositionColor(classification);
 
                             e.Graphics.DrawString(position,
-                                new Font("Segoe UI", 9, FontStyle.Bold), new SolidBrush(color),
+                                new Font(commonFont, 9, FontStyle.Bold), new SolidBrush(color),
                                 testPoint.X + 10, testPoint.Y - 15);
                         }
                     }
@@ -832,12 +833,12 @@ namespace Editor
                 _ => "Режим: Неизвестен"
             };
 
-            e.Graphics.DrawString(modeText, new Font("Segoe UI", 9),
+            e.Graphics.DrawString(modeText, new Font(commonFont, 9),
                 Brushes.DarkGray, 200, this.Height - 25);
         }
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Escape)
+            if (e.KeyCode == Keys.Space)
             {
                 if (currentMode == Mode.Drawing && currentPolygon != null && currentPolygon.Points.Count > 0)
                 {
@@ -849,15 +850,6 @@ namespace Editor
                     {
                         polygons.Add(currentPolygon);
                     }
-                    currentPolygon = null;
-                    this.Invalidate();
-                }
-            }
-            else if (e.KeyCode == Keys.Enter && currentMode == Mode.Drawing)
-            {
-                if (currentPolygon != null && currentPolygon.Points.Count >= 3)
-                {
-                    polygons.Add(currentPolygon);
                     currentPolygon = null;
                     this.Invalidate();
                 }
