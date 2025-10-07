@@ -220,12 +220,12 @@ namespace lab4
                 }
             }
             // Подписи осей в углах
-            g.DrawString("X", new Font(commonFont, 9, FontStyle.Bold), Brushes.Black, this.Width - 20, centerPoint.Y - 15);
-            g.DrawString("Y", new Font(commonFont, 9, FontStyle.Bold), Brushes.Black, centerPoint.X + 5, 5);
+            g.DrawString("X", new Font(commonFont, 9, FontStyle.Bold), Brushes.Black, this.Width - 35, centerPoint.Y - 25);
+            g.DrawString("Y", new Font(commonFont, 9, FontStyle.Bold), Brushes.Black, centerPoint.X - 25, 5);
 
             // Отметка центра
             g.FillEllipse(Brushes.DarkSlateBlue, centerPoint.X - 2, centerPoint.Y - 2, 6, 6);
-            g.DrawString("O(0,0)", new Font(commonFont, 9), Brushes.DarkSlateBlue, centerPoint.X + 5, centerPoint.Y + 5);
+            g.DrawString("(0,0)", new Font(commonFont, 9), Brushes.DarkSlateBlue, centerPoint.X + 5, centerPoint.Y + 5);
         }
 
         // Методы для преобразования координат
