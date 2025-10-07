@@ -515,38 +515,17 @@ namespace Editor
 
             try
             {
-                switch (transformComboBox.SelectedIndex)
-                {
-                    case 0: // Смещение
-                        float dx = float.Parse(dxTextBox.Text);
-                        float dy = float.Parse(dyTextBox.Text);
-                        AffineTransformHelper.Translate(selectedPolygon, dx, dy);
-                        break;
+                AffineTransformHelper.ApplyTransform(
+                    selectedPolygon,
+                    transformComboBox.SelectedIndex,
+                    dxTextBox.Text,
+                    dyTextBox.Text,
+                    angleTextBox.Text,
+                    scaleTextBox.Text,
+                    centerXTextBox.Text,
+                    centerYTextBox.Text
+                );
 
-                    case 1: // Поворот вокруг точки
-                        float angle1 = float.Parse(angleTextBox.Text);
-                        float centerX1 = float.Parse(centerXTextBox.Text);
-                        float centerY1 = float.Parse(centerYTextBox.Text);
-                        AffineTransformHelper.Rotate(selectedPolygon, angle1, new PointF(centerX1, centerY1));
-                        break;
-
-                    case 2: // Поворот вокруг центра
-                        float angle2 = float.Parse(angleTextBox.Text);
-                        AffineTransformHelper.RotateAroundCenter(selectedPolygon, angle2);
-                        break;
-
-                    case 3: // Масштабирование от точки
-                        float scale1 = float.Parse(scaleTextBox.Text);
-                        float centerX2 = float.Parse(centerXTextBox.Text);
-                        float centerY2 = float.Parse(centerYTextBox.Text);
-                        AffineTransformHelper.Scale(selectedPolygon, scale1, new PointF(centerX2, centerY2));
-                        break;
-
-                    case 4: // Масштабирование от центра
-                        float scale2 = float.Parse(scaleTextBox.Text);
-                        AffineTransformHelper.ScaleAroundCenter(selectedPolygon, scale2);
-                        break;
-                }
                 this.Invalidate();
             }
             catch (FormatException)
@@ -554,8 +533,12 @@ namespace Editor
                 MessageBox.Show("Пожалуйста, введите корректные числовые значения.", "Ошибка",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при применении преобразования: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-
         private void UpdateInputVisibility()
         {
             int selectedIndex = transformComboBox.SelectedIndex;
