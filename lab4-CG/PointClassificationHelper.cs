@@ -1,6 +1,6 @@
 ﻿using System.Drawing;
 
-namespace Editor
+namespace lab4
 {
     public static class PointClassificationHelper
     {

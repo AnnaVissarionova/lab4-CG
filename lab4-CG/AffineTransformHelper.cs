@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Collections.Generic;
 
-namespace Editor
+namespace lab4
 {
     public static class AffineTransformHelper
     {

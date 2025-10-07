@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms.VisualStyles;
 
-namespace Editor
+namespace lab4
 {
     public static class IntersectionHelper
     {

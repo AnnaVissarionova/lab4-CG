@@ -1,11 +1,6 @@
-﻿using Editor;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
+﻿using System.Drawing;
 
-namespace Editor
+namespace lab4
 {
     public partial class MainForm : Form
     {
@@ -42,13 +37,18 @@ namespace Editor
         private Label dxLabel, dyLabel, angleLabel, scaleLabel, centerXLabel, centerYLabel;
 
         // Цветовая схема
-        private Color backgroundColor = Color.FromArgb(240, 240, 240);
-        private Color panelColor = Color.FromArgb(250, 250, 250);
-        private Color borderColor = Color.FromArgb(200, 200, 200);
-        private Color accentColor = Color.FromArgb(70, 130, 180);
+        private Color backgroundColor = Color.FromArgb(234, 244, 244);
+        private Color panelColor = Color.FromArgb(204, 227, 222);
+        private Color borderColor = Color.FromArgb(164, 195, 178);
+        private Color accentColor = Color.FromArgb(107, 144, 128);
+        private Color fontColor = Color.FromArgb(11, 57, 84);
+
+        int formHeight;
+        int formWidth;
 
         public MainForm()
         {
+            this.WindowState = FormWindowState.Maximized;
             InitializeComponent();
             InitializeAffinePanel();
             InitializeClassificationPanel();
@@ -76,9 +76,9 @@ namespace Editor
             // Заголовок
             var titleLabel = new Label
             {
-                Text = "Polygon Editor",
-                Font = new Font(commonFont, 11, FontStyle.Bold),
-                ForeColor = Color.FromArgb(60, 60, 60),
+                Text = "Лабораторная №4",
+                Font = new Font(commonFont, 10, FontStyle.Bold),
+                ForeColor = fontColor,
                 Location = new Point(10, 10),
                 Size = new Size(150, 25),
                 TextAlign = ContentAlignment.MiddleLeft
@@ -108,11 +108,11 @@ namespace Editor
             // Кнопка очистки
             var clearButton = new Button
             {
-                Text = "Очистка сцены",
+                Text = "Очистить",
                 Location = new Point(10, 180),
                 Size = new Size(150, 30),
                 BackColor = Color.White,
-                ForeColor = Color.FromArgb(60, 60, 60),
+                ForeColor = fontColor,
                 FlatStyle = FlatStyle.Flat,
                 Font = new Font(commonFont, 9)
             };
@@ -122,8 +122,8 @@ namespace Editor
             // Информация
             var infoLabel = new Label
             {
-                Text = "ЛКМ - добавить точку\nПробел - замкнуть полигон",
-                ForeColor = Color.FromArgb(100, 100, 100),
+                Text = "ЛКМ - добавить точку\nEsc - замкнуть полигон",
+                ForeColor = Color.FromArgb(20, fontColor.R, fontColor.G, fontColor.B),
                 Font = new Font(commonFont, 8),
                 Location = new Point(10, 220),
                 Size = new Size(150, 60)
@@ -142,7 +142,7 @@ namespace Editor
             this.Controls.Add(controlPanel);
 
             this.Size = new Size(900, 600);
-            this.Text = "Polygon Editor";
+            this.Text = "Лабораторная №4";
             this.BackColor = backgroundColor;
             this.StartPosition = FormStartPosition.CenterScreen;
             this.ResumeLayout();
@@ -186,8 +186,8 @@ namespace Editor
                     // Подписи оси X
                     int coordX = (int)((x - centerPoint.X) / gridSize);
                     string label = coordX.ToString();
-                    SizeF textSize = g.MeasureString(label, new Font("Arial", 7));
-                    g.DrawString(label, new Font("Arial", 7), Brushes.Gray,
+                    SizeF textSize = g.MeasureString(label, new Font(commonFont, 7));
+                    g.DrawString(label, new Font(commonFont, 7), Brushes.Gray,
                                 x - textSize.Width / 2, centerPoint.Y + 5);
                 }
                 else
@@ -210,8 +210,8 @@ namespace Editor
                     // Подписи оси Y
                     int coordY = (int)((centerPoint.Y - y) / gridSize);
                     string label = coordY.ToString();
-                    SizeF textSize = g.MeasureString(label, new Font("Arial", 7));
-                    g.DrawString(label, new Font("Arial", 7), Brushes.Gray,
+                    SizeF textSize = g.MeasureString(label, new Font(commonFont, 7));
+                    g.DrawString(label, new Font(commonFont, 7), Brushes.Gray,
                                 centerPoint.X + 5, y - textSize.Height / 2);
                 }
                 else
@@ -219,14 +219,13 @@ namespace Editor
                     g.DrawLine(gridPen, 0, y, this.Width, y);
                 }
             }
-
             // Подписи осей в углах
-            g.DrawString("X", new Font("Arial", 9, FontStyle.Bold), Brushes.Black, this.Width - 20, centerPoint.Y - 15);
-            g.DrawString("Y", new Font("Arial", 9, FontStyle.Bold), Brushes.Black, centerPoint.X + 5, 5);
+            g.DrawString("X", new Font(commonFont, 9, FontStyle.Bold), Brushes.Black, this.Width - 20, centerPoint.Y - 15);
+            g.DrawString("Y", new Font(commonFont, 9, FontStyle.Bold), Brushes.Black, centerPoint.X + 5, 5);
 
             // Отметка центра
-            g.FillEllipse(Brushes.Red, centerPoint.X - 2, centerPoint.Y - 2, 4, 4);
-            g.DrawString("O(0,0)", new Font("Arial", 7), Brushes.Red, centerPoint.X + 5, centerPoint.Y + 5);
+            g.FillEllipse(Brushes.DarkSlateBlue, centerPoint.X - 2, centerPoint.Y - 2, 6, 6);
+            g.DrawString("O(0,0)", new Font(commonFont, 9), Brushes.DarkSlateBlue, centerPoint.X + 5, centerPoint.Y + 5);
         }
 
         // Методы для преобразования координат
@@ -255,7 +254,7 @@ namespace Editor
                 Text = text,
                 Location = new Point(15, y),
                 Size = new Size(160, 20),
-                ForeColor = Color.FromArgb(60, 60, 60),
+                ForeColor = fontColor,
                 BackColor = panelColor,
                 Font = new Font(commonFont, 9),
                 Checked = isChecked
@@ -267,10 +266,10 @@ namespace Editor
             affinePanel = new Panel
             {
                 Location = new Point(190, 10),
-                Size = new Size(320, 300),
+                Size = new Size(330, 300),
                 BackColor = panelColor,
                 BorderStyle = BorderStyle.FixedSingle,
-                Visible = false
+                Visible = false,
             };
 
             // Заголовок панели преобразований
@@ -278,15 +277,15 @@ namespace Editor
             {
                 Text = "Аффинные преобразования",
                 Font = new Font(commonFont, 10, FontStyle.Bold),
-                ForeColor = Color.FromArgb(60, 60, 60),
-                Location = new Point(10, 10),
-                Size = new Size(360, 20),
+                ForeColor = fontColor,
+                Location = new Point(10, 30),
+                Size = new Size(330, 20),
                 TextAlign = ContentAlignment.MiddleCenter
             };
 
             transformComboBox = new ComboBox
             {
-                Location = new Point(10, 35),
+                Location = new Point(10, 75),
                 Size = new Size(300, 25),
                 DropDownStyle = ComboBoxStyle.DropDownList,
                 Font = new Font(commonFont, 9)
@@ -302,34 +301,34 @@ namespace Editor
             transformComboBox.SelectedIndexChanged += TransformComboBox_SelectedIndexChanged;
 
             // Поля ввода
-            int inputY = 70;
-            int labelWidth = 60;
+            int inputY = 110;
+            int labelWidth = 70;
             int textBoxWidth = 60;
             int firstColumnX = 10;
             int secondColumnX = 170;
 
             // Первая строка - dx, dy
             dxLabel = CreateInputLabel("dx:", firstColumnX, inputY, labelWidth);
-            dxTextBox = CreateInputTextBox(firstColumnX + 65, inputY, textBoxWidth, "0");
+            dxTextBox = CreateInputTextBox(firstColumnX + 70, inputY, textBoxWidth, "0");
 
             dyLabel = CreateInputLabel("dy:", secondColumnX, inputY, labelWidth);
-            dyTextBox = CreateInputTextBox(secondColumnX + 65, inputY, textBoxWidth, "0");
+            dyTextBox = CreateInputTextBox(secondColumnX + 70, inputY, textBoxWidth, "0");
 
             // Вторая строка - угол, масштаб
             inputY += 30;
             angleLabel = CreateInputLabel("Угол:", firstColumnX, inputY, labelWidth);
-            angleTextBox = CreateInputTextBox(firstColumnX + 65, inputY, textBoxWidth, "0");
+            angleTextBox = CreateInputTextBox(firstColumnX + 70, inputY, textBoxWidth, "0");
 
             scaleLabel = CreateInputLabel("Масштаб:", secondColumnX, inputY, labelWidth);
-            scaleTextBox = CreateInputTextBox(secondColumnX + 65, inputY, textBoxWidth, "1");
+            scaleTextBox = CreateInputTextBox(secondColumnX + 70, inputY, textBoxWidth, "1");
 
             // Третья строка - центр
             inputY += 30;
             centerXLabel = CreateInputLabel("Центр X:", firstColumnX, inputY, labelWidth);
-            centerXTextBox = CreateInputTextBox(firstColumnX + 65, inputY, textBoxWidth, "0");
+            centerXTextBox = CreateInputTextBox(firstColumnX + 70, inputY, textBoxWidth, "0");
 
             centerYLabel = CreateInputLabel("Центр Y:", secondColumnX, inputY, labelWidth);
-            centerYTextBox = CreateInputTextBox(secondColumnX + 65, inputY, textBoxWidth, "0");
+            centerYTextBox = CreateInputTextBox(secondColumnX + 70, inputY, textBoxWidth, "0");
 
             // Разделитель
             var separator2 = new Label
@@ -343,7 +342,7 @@ namespace Editor
             applyTransformButton = new Button
             {
                 Text = "Применить преобразование",
-                Location = new Point(10, inputY + 45),
+                Location = new Point(10, inputY +65),
                 Size = new Size(300, 32),
                 BackColor = accentColor,
                 ForeColor = Color.White,
@@ -353,15 +352,7 @@ namespace Editor
             applyTransformButton.FlatAppearance.BorderColor = accentColor;
             applyTransformButton.Click += ApplyTransformButton_Click;
 
-            // Статус
-            var statusLabel = new Label
-            {
-                Text = "Выберите полигон на сцене и настройте параметры",
-                ForeColor = Color.FromArgb(100, 100, 100),
-                Font = new Font(commonFont, 8),
-                Location = new Point(10, inputY + 85),
-                Size = new Size(260, 35)
-            };
+          
 
             // Добавляем все контролы в панель
             affinePanel.Controls.Add(affineTitle);       
@@ -404,7 +395,7 @@ namespace Editor
             {
                 Text = "Классификация точки",
                 Font = new Font(commonFont, 10, FontStyle.Bold),
-                ForeColor = Color.FromArgb(60, 60, 60),
+                ForeColor = fontColor,
                 Location = new Point(10, 10),
                 Size = new Size(180, 20),
                 TextAlign = ContentAlignment.MiddleCenter
@@ -417,7 +408,7 @@ namespace Editor
                 Location = new Point(10, 40),
                 Size = new Size(180, 30),
                 BackColor = accentColor,
-                ForeColor = Color.White,
+                ForeColor = fontColor,
                 FlatStyle = FlatStyle.Flat
             };
 
@@ -427,7 +418,7 @@ namespace Editor
                 Location = new Point(10, 75),
                 Size = new Size(180, 30),
                 BackColor = Color.LightGray,
-                ForeColor = Color.Black,
+                ForeColor = fontColor,
                 FlatStyle = FlatStyle.Flat,
                 Enabled = false
             };
@@ -438,14 +429,14 @@ namespace Editor
                 Location = new Point(10, 110),
                 Size = new Size(180, 30),
                 BackColor = Color.White,
-                ForeColor = Color.Black,
+                ForeColor = fontColor,
                 FlatStyle = FlatStyle.Flat
             };
 
             statusLabel = new Label
             {
                 Text = "Выберите ребро на сцене",
-                ForeColor = Color.FromArgb(100, 100, 100),
+                ForeColor = fontColor,
                 Font = new Font(commonFont, 8),
                 Location = new Point(10, 145),
                 Size = new Size(180, 30)
@@ -594,7 +585,7 @@ namespace Editor
                 Text = text,
                 Location = new Point(x, y),
                 Size = new Size(width, 20),
-                ForeColor = Color.FromArgb(60, 60, 60),
+                ForeColor = fontColor,
                 Font = new Font(commonFont, 9),
                 TextAlign = ContentAlignment.MiddleLeft
             };
@@ -714,6 +705,8 @@ namespace Editor
 
         private void MainForm_Paint(object sender, PaintEventArgs e)
         {
+            formHeight = this.Height;
+            formWidth = this.Width;
             e.Graphics.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             e.Graphics.Clear(backgroundColor);
 
@@ -746,8 +739,8 @@ namespace Editor
             switch (currentMode)
             {
                 case Mode.Intersection:
-                    if (selectedEdge1 != null) selectedEdge1.Draw(e.Graphics, new Pen(Color.Red, 2), centerPoint, gridSize);
-                    if (selectedEdge2 != null) selectedEdge2.Draw(e.Graphics, new Pen(Color.Blue, 2), centerPoint, gridSize);
+                    if (selectedEdge1 != null) selectedEdge1.Draw(e.Graphics, new Pen(Color.FromArgb(249, 65, 68), 2), centerPoint, gridSize);
+                    if (selectedEdge2 != null) selectedEdge2.Draw(e.Graphics, new Pen(Color.FromArgb(249, 199, 79), 2), centerPoint, gridSize);
 
                     if (selectedEdge1 != null && selectedEdge2 != null)
                     {
@@ -759,7 +752,7 @@ namespace Editor
                                 centerPoint.X + intersection.Value.X * gridSize,
                                 centerPoint.Y - intersection.Value.Y * gridSize
                             );
-                            e.Graphics.FillEllipse(Brushes.Green,
+                            e.Graphics.FillEllipse(new SolidBrush(accentColor),
                                 screenIntersection.X - 4, screenIntersection.Y - 4, 8, 8);
                         }
                     }
@@ -768,7 +761,7 @@ namespace Editor
                 case Mode.PointInPolygon:
                     if (!testPoint.IsEmpty)
                     {
-                        e.Graphics.FillEllipse(Brushes.Red, testPoint.X - 4, testPoint.Y - 4, 8, 8);
+                        e.Graphics.FillEllipse(Brushes.DarkBlue, testPoint.X - 4, testPoint.Y - 4, 8, 8);
 
                         bool insideAny = false;
                         foreach (var polygon in polygons)
@@ -781,10 +774,16 @@ namespace Editor
                                     centerPoint.X + worldCenter.X * gridSize,
                                     centerPoint.Y - worldCenter.Y * gridSize
                                 );
-                                e.Graphics.DrawString("ВНУТРИ",
-                                    new Font(commonFont, 9, FontStyle.Bold), Brushes.Green,
-                                    screenCenter.X, screenCenter.Y - 20);
+                                e.Graphics.DrawString($"точка внутри",
+                                    new Font(commonFont, 9, FontStyle.Bold), Brushes.DarkBlue,
+                                    testPoint);
                             }
+                        }
+                        if (!insideAny)
+                        {
+                            e.Graphics.DrawString($"точка cнаружи",
+                                   new Font(commonFont, 9, FontStyle.Bold), Brushes.DarkBlue,
+                                   testPoint);
                         }
                     }
                     break;
@@ -793,14 +792,14 @@ namespace Editor
                     // Явно рисуем выбранное ребро красным цветом
                     if (selectedEdge1 != null)
                     {
-                        var redPen = new Pen(Color.Red, 3);
-                        selectedEdge1.Draw(e.Graphics, redPen, centerPoint, gridSize);
+                        selectedEdge1.Draw(e.Graphics, new Pen(Color.FromArgb(248, 150, 30), 3), centerPoint, gridSize);
                     }
 
                     // Рисуем точку и подпись
                     if (!testPoint.IsEmpty)
                     {
-                        e.Graphics.FillEllipse(Brushes.Purple, testPoint.X - 4, testPoint.Y - 4, 8, 8);
+                        Color color = Color.FromArgb(249, 65, 68);
+                        e.Graphics.FillEllipse(new SolidBrush(color), testPoint.X - 4, testPoint.Y - 4, 8, 8);
 
                         if (selectedEdge1 != null)
                         {
@@ -808,11 +807,9 @@ namespace Editor
                                 (testPoint.X - centerPoint.X) / gridSize,
                                 (centerPoint.Y - testPoint.Y) / gridSize
                             );
-
                             int classification = PointClassificationHelper.ClassifyPointRelativeToEdge(worldPoint, selectedEdge1);
-                            string position = classification > 0 ? "СЛЕВА" :
-                                            classification < 0 ? "СПРАВА" : "НА ЛИНИИ";
-                            Color color = PointClassificationHelper.GetPositionColor(classification);
+                            string position = classification > 0 ? "точка справа" :
+                                            classification < 0 ? "точка слева" : "точка на ребре";
 
                             e.Graphics.DrawString(position,
                                 new Font(commonFont, 9, FontStyle.Bold), new SolidBrush(color),
@@ -838,7 +835,7 @@ namespace Editor
         }
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyCode == Keys.Space)
+            if (e.KeyCode == Keys.Escape)
             {
                 if (currentMode == Mode.Drawing && currentPolygon != null && currentPolygon.Points.Count > 0)
                 {
@@ -972,5 +969,7 @@ namespace Editor
                 }
             }
         }
+
+        
     }
 }

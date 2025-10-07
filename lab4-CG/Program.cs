@@ -1,7 +1,7 @@
 using System;
 using System.Windows.Forms;
 
-namespace Editor
+namespace lab4
 {
     static class Program
     {
