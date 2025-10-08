@@ -433,14 +433,7 @@ namespace lab4
                 FlatStyle = FlatStyle.Flat
             };
 
-            statusLabel = new Label
-            {
-                Text = "Выберите ребро на сцене",
-                ForeColor = fontColor,
-                Font = new Font(commonFont, 8),
-                Location = new Point(10, 145),
-                Size = new Size(180, 30)
-            };
+            
 
             // добавляем обработчики
             selectEdgeButton.Click += (s, e) => {
@@ -637,7 +630,7 @@ namespace lab4
                 selectPointButton.Enabled = false;
                 selectEdgeButton.BackColor = accentColor;
                 selectPointButton.BackColor = Color.LightGray;
-                statusLabel.Text = "Выберите ребро на сцене";
+               
             }
 
             if (mode != Mode.Intersection)
@@ -794,6 +787,9 @@ namespace lab4
                     {
                         selectedEdge1.Draw(e.Graphics, new Pen(Color.FromArgb(248, 150, 30), 3), centerPoint, gridSize);
                     }
+                  /*  e.Graphics.DrawString($"зеленая точка - начало ребра, синяя - конец ребра",
+                                   new Font(commonFont, 9, FontStyle.Bold), Brushes.DarkBlue,
+                                   form);*/
 
                     // Рисуем точку и подпись
                     if (!testPoint.IsEmpty)
@@ -808,8 +804,8 @@ namespace lab4
                                 (centerPoint.Y - testPoint.Y) / gridSize
                             );
                             int classification = PointClassificationHelper.ClassifyPointRelativeToEdge(worldPoint, selectedEdge1);
-                            string position = classification > 0 ? "точка справа" :
-                                            classification < 0 ? "точка слева" : "точка на ребре";
+                            string position = classification > 0 ? "точка слева" :
+                                            classification < 0 ? "точка справа" : "точка на ребре";
 
                             e.Graphics.DrawString(position,
                                 new Font(commonFont, 9, FontStyle.Bold), new SolidBrush(color),
@@ -918,7 +914,6 @@ namespace lab4
                 {
                     selectedEdge1 = edge;
                     selectPointButton.Enabled = true;
-                    statusLabel.Text = "Ребро выбрано! Нажмите 'Выбрать точку'";
                     this.Invalidate();
                 }
             }
@@ -935,7 +930,6 @@ namespace lab4
                                 classification < 0 ? "СПРАВА" : "НА ЛИНИИ";
 
                 testPoint = screenPoint;
-                statusLabel.Text = $"Точка находится: {position}";
                 this.Invalidate();
             }
         }

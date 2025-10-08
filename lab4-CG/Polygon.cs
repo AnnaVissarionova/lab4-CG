@@ -179,6 +179,8 @@ public class Edge
 
     public void Draw(Graphics graphics, Pen pen, PointF centerPoint, int gridSize)
     {
+        Pen color_start = new Pen(Color.FromArgb(144, 190, 109));
+        Pen color_end = new Pen(Color.FromArgb(87, 117, 144));
         // Преобразуем в экранные координаты
         var screenStart = new PointF(
             centerPoint.X + Start.X * gridSize,
@@ -192,8 +194,12 @@ public class Edge
         graphics.DrawLine(pen, screenStart, screenEnd);
 
         // Вершины
-        graphics.FillEllipse(pen.Brush, screenStart.X - 2, screenStart.Y - 2, 4, 4);
-        graphics.FillEllipse(pen.Brush, screenEnd.X - 2, screenEnd.Y - 2, 4, 4);
+        graphics.FillEllipse(color_start.Brush, screenStart.X - 3, screenStart.Y - 3, 6, 6);
+        graphics.DrawEllipse(color_start, screenStart.X - 3, screenStart.Y - 3, 6, 6);
+
+        // Рисуем End точку - КРАСНЫЙ цвет
+        graphics.FillEllipse(color_end.Brush, screenEnd.X - 3, screenEnd.Y - 3, 6, 6);
+        graphics.DrawEllipse(color_end, screenEnd.X - 3, screenEnd.Y - 3, 6, 6);
     }
 
     public void Draw(Graphics graphics, Pen pen)
