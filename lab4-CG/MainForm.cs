@@ -440,7 +440,6 @@ namespace lab4
                 isSelectingEdge = true;
                 selectEdgeButton.BackColor = accentColor;
                 selectPointButton.BackColor = Color.LightGray;
-                statusLabel.Text = "Выберите ребро на сцене";
                 testPoint = Point.Empty;
                 this.Invalidate();
             };
@@ -451,7 +450,6 @@ namespace lab4
                     isSelectingEdge = false;
                     selectPointButton.BackColor = accentColor;
                     selectEdgeButton.BackColor = Color.LightGray;
-                    statusLabel.Text = "Выберите точку на сцене";
                 }
                 else
                 {
@@ -787,9 +785,7 @@ namespace lab4
                     {
                         selectedEdge1.Draw(e.Graphics, new Pen(Color.FromArgb(248, 150, 30), 3), centerPoint, gridSize);
                     }
-                  /*  e.Graphics.DrawString($"зеленая точка - начало ребра, синяя - конец ребра",
-                                   new Font(commonFont, 9, FontStyle.Bold), Brushes.DarkBlue,
-                                   form);*/
+                    e.Graphics.DrawString($"зеленая точка - начало ребра, синяя - конец ребра",new Font(commonFont, 9, FontStyle.Bold), Brushes.DarkBlue, new PointF(formWidth*0.05f, formHeight*0.9f));
 
                     // Рисуем точку и подпись
                     if (!testPoint.IsEmpty)
@@ -924,11 +920,7 @@ namespace lab4
                     (screenPoint.X - centerPoint.X) / gridSize,
                     (centerPoint.Y - screenPoint.Y) / gridSize
                 );
-
-                int classification = PointClassificationHelper.ClassifyPointRelativeToEdge(worldPoint, selectedEdge1);
-                string position = classification > 0 ? "СЛЕВА" :
-                                classification < 0 ? "СПРАВА" : "НА ЛИНИИ";
-
+    
                 testPoint = screenPoint;
                 this.Invalidate();
             }
